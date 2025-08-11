@@ -1,3 +1,63 @@
+
+## EN | English
+
+### Overview
+This script reads devices from an Excel file, creates them in **WALLIX Bastion PAM**, adds the proper service (**SSH/RDP**), and optionally assigns each device+service pair to a **Target Group**.
+
+### Features
+- Device names like `ServerName_<lastTwoOctets>`, e.g. `MySrv_34.213`
+- Adds service based on the `Service` column (currently **SSH**, **RDP**)
+- Group assignment using **device & service names**
+- Handles `204/409` and resolves IDs via pagination
+- Fully configurable via CLI args or env vars
+- Optional CSV run log
+
+### Prerequisites
+- Python 3.9+  
+- Install deps:
+```bash
+pip install -r requirements.txt
+```
+
+### Excel columns (defaults)
+- `Destination ip`
+- `Server Name`
+- `Service` (`SSH` or `RDP`)
+
+### Quick start
+```bash
+python pam_updated.py   --host bastion.example.local   --api-version v3.12   --username admin   --excel "PAM Access 4.xlsx"   --group "IT Services"   --csv-log output.csv
+```
+If `--password` is omitted, you'll be prompted.  
+You can also use env vars:
+```
+BASTION_HOST, BASTION_API_VERSION, BASTION_USERNAME, BASTION_PASSWORD
+```
+
+### Do I have to keep the Excel filename?
+No. Pass any path you want:
+```bash
+python pam_updated.py --excel "Path_to\MyServers.xlsx"
+```
+If you have multiple sheets:
+```bash
+python pam_updated.py --excel "MyServers.xlsx" --sheet "Sheet1"
+```
+
+### Common options (CLI)
+- `--excel`, `--sheet`
+- `--ip-column`, `--name-column`, `--service-column`
+- `--group "IT Services"` (use `--no-group` to disable)
+- `--description "IT Services"`
+- `--insecure` (testing only)
+- `--csv-log out.csv`
+
+### Notes
+- To support more protocols, extend `build_service_payload()`.
+- Group assignment is done with **device/service names**.
+- Use `--no-group` if you don't want any group assignment.
+
+
 # WALLIX Bastion PAM – Excel Import (Devices + Services + Target Group)
 
 **FA | فارسی** — پایین همین فایل نسخهٔ انگلیسی هم هست.
@@ -38,7 +98,7 @@ BASTION_HOST, BASTION_API_VERSION, BASTION_USERNAME, BASTION_PASSWORD
 ### آیا لازم است اسم فایل Excel حتماً همین باشد؟
 خیر. هر نام/مسیر دلخواه را می‌توانید بدهید:
 ```bash
-python pam_updated.py --excel "C:\Users\mahdi.yaghoubi\Downloads\MyServers.xlsx"
+python pam_updated.py --excel "Path_to\MyServers.xlsx"
 ```
 اگر چند شیت دارید:
 ```bash
@@ -61,60 +121,3 @@ python pam_updated.py --excel "MyServers.xlsx" --sheet "Sheet1"
 
 ---
 
-## EN | English
-
-### Overview
-This script reads devices from an Excel file, creates them in **WALLIX Bastion PAM**, adds the proper service (**SSH/RDP**), and optionally assigns each device+service pair to a **Target Group**.
-
-### Features
-- Device names like `ServerName_<lastTwoOctets>`, e.g. `MySrv_34.213`
-- Adds service based on the `Service` column (currently **SSH**, **RDP**)
-- Group assignment using **device & service names**
-- Handles `204/409` and resolves IDs via pagination
-- Fully configurable via CLI args or env vars
-- Optional CSV run log
-
-### Prerequisites
-- Python 3.9+  
-- Install deps:
-```bash
-pip install -r requirements.txt
-```
-
-### Excel columns (defaults)
-- `Destination ip`
-- `Server Name`
-- `Service` (`SSH` or `RDP`)
-
-### Quick start
-```bash
-python pam_updated.py   --host bastion.example.local   --api-version v3.12   --username admin   --excel "PAM Access 4.xlsx"   --group "IT Services"   --csv-log output.csv
-```
-If `--password` is omitted, you'll be prompted.  
-You can also use env vars:
-```
-BASTION_HOST, BASTION_API_VERSION, BASTION_USERNAME, BASTION_PASSWORD
-```
-
-### Do I have to keep the Excel filename?
-No. Pass any path you want:
-```bash
-python pam_updated.py --excel "C:\Users\mahdi.yaghoubi\Downloads\MyServers.xlsx"
-```
-If you have multiple sheets:
-```bash
-python pam_updated.py --excel "MyServers.xlsx" --sheet "Sheet1"
-```
-
-### Common options (CLI)
-- `--excel`, `--sheet`
-- `--ip-column`, `--name-column`, `--service-column`
-- `--group "IT Services"` (use `--no-group` to disable)
-- `--description "IT Services"`
-- `--insecure` (testing only)
-- `--csv-log out.csv`
-
-### Notes
-- To support more protocols, extend `build_service_payload()`.
-- Group assignment is done with **device/service names**.
-- Use `--no-group` if you don't want any group assignment.
